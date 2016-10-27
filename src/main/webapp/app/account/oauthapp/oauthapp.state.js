@@ -54,50 +54,25 @@
                 });
             }]
         })
-        .state('oauthapp.edit', {
-            parent: 'oauthapp',
-            url: '/{id}/edit',
-            data: {
-                authorities: ['ROLE_USER']
-            },
-            onEnter: ['$stateParams', '$state', '$uibModal', function($stateParams, $state, $uibModal) {
-                $uibModal.open({
-                    templateUrl: 'app/entities/products/products-dialog.html',
-                    controller: 'ProductsDialogController',
-                    controllerAs: 'vm',
-                    backdrop: 'static',
-                    size: 'lg',
-                    resolve: {
-                        entity: ['Products', function(Products) {
-                            return Products.get({id : $stateParams.id}).$promise;
-                        }]
-                    }
-                }).result.then(function() {
-                    $state.go('products', null, { reload: true });
-                }, function() {
-                    $state.go('^');
-                });
-            }]
-        })
         .state('oauthapp.delete', {
-            parent: 'products',
+            parent: 'oauthapp',
             url: '/{id}/delete',
             data: {
                 authorities: ['ROLE_USER']
             },
             onEnter: ['$stateParams', '$state', '$uibModal', function($stateParams, $state, $uibModal) {
                 $uibModal.open({
-                    templateUrl: 'app/entities/products/products-delete-dialog.html',
-                    controller: 'ProductsDeleteController',
+                    templateUrl: 'app/account/oauthapp/oauthapps-delete-dialog.html',
+                    controller: 'OauthAppsDeleteController',
                     controllerAs: 'vm',
                     size: 'md',
                     resolve: {
-                        entity: ['Products', function(Products) {
-                            return Products.get({id : $stateParams.id}).$promise;
+                        entity: ['OauthApps', function(OauthApps) {
+                            return OauthApps.get({id : $stateParams.id}).$promise;
                         }]
                     }
                 }).result.then(function() {
-                    $state.go('products', null, { reload: true });
+                    $state.go('oauthapp', null, { reload: true });
                 }, function() {
                     $state.go('^');
                 });

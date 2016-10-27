@@ -32,6 +32,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -582,7 +583,7 @@ public class AccountResource {
 	}
 
     /**
-     * POST /account/createapp : Creates the app for the merchant account which he can use to authorise and perform operations over API
+     * POST /account/apps : Creates the app for the any account which he can use to authorise and perform operations over API
      *
      * @param oauthClientDetailsDTO
      * the oauth client details which needs to inserted by any user who is logged in or already authenticated
@@ -596,7 +597,13 @@ public class AccountResource {
 
         return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).map(u ->{
 
-            OauthClientDetails oauthClientDetails = userService.createApplication(oauthClientDetailsDTO,u);
+            try {
+                OauthClientDetails oauthClientDetails = userService.createApplication(oauthClientDetailsDTO,u);
+            } catch (NoSuchAlgorithmException e) {
+                log.debug("Error while creating oauth app for" + u.getFirstName() + e);
+                e.printStackTrace();
+            }
+
 
             return new ResponseEntity<String>(HttpStatus.CREATED);
 
@@ -604,20 +611,58 @@ public class AccountResource {
 
     }
 
+
+    /**
+     * GET /account/apps : Get all oauth apps for current user logged in
+     *
+     *
+     * Oauth client details For Current User Logged in.
+     *
+     *
+     */
     @RequestMapping(value = "/account/apps", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<?> retriveAllApps() {
         return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).map(u ->{
 
-            OauthData oauthData = userService.retrieveApplications(u);
+            List<OauthData> oauthData = userService.retrieveApplications(u);
 
-            return new ResponseEntity<OauthData>(oauthData, HttpStatus.FOUND);
+            return new ResponseEntity<List<OauthData>>(oauthData, HttpStatus.OK);
 
-        }).orElse(new ResponseEntity<OauthData>(HttpStatus.INTERNAL_SERVER_ERROR));
+        }).orElse(new ResponseEntity<List<OauthData>>(HttpStatus.INTERNAL_SERVER_ERROR));
 
     }
 
+    /**
+     *  GET /account/apps/{id} : Get all oauth apps for current user logged in
+     *
+     *  Oauth client details for the id for current user logged in.
+     *
+     *  @param id
+     */
+    @RequestMapping(value ="/account/apps/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<?> retrieveSingleOauthApp(@PathVariable Long id){
+        log.debug("Rest request to get oauth apps: {}", id);
 
+        return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).map(u ->{
+
+            OauthData oauthData = userService.findOneOauth(id);
+
+            return new ResponseEntity<OauthData>(oauthData,HttpStatus.OK);
+        }).orElse(new ResponseEntity<OauthData>(HttpStatus.INTERNAL_SERVER_ERROR));
+
+
+    }
+
+    /**
+     * DELETE /account/apps : Delete single application oauth apps for current user logged in
+     *
+     *
+     * @param applicationname
+     *
+     *
+     */
     @RequestMapping(value = "/account/apps", method = RequestMethod.DELETE, produces = MediaType.TEXT_PLAIN_VALUE)
     @Timed
     public ResponseEntity<String> deleteApp(@RequestParam(value = "applicationname") String applicationname) {

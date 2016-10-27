@@ -23,6 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -201,15 +204,18 @@ public class UserService {
         return user;
     }
 
-    public OauthClientDetails createApplication(OauthClientDetailsDTO oauthClientDetailsDTO,User u){
+    public OauthClientDetails createApplication(OauthClientDetailsDTO oauthClientDetailsDTO,User u) throws NoSuchAlgorithmException {
         OauthClientDetails oauthClientDetails = new OauthClientDetails();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
         Date today = Calendar.getInstance().getTime();
         String date = sdf.format(today);
-        oauthClientDetails.setApplicationname(date + oauthClientDetailsDTO.getApplicationname());
+        oauthClientDetails.setApplicationname((today.getTime() + "" +u.getId()).replaceAll("\\W_", ""));
         byte[] encode = Base64.encode(oauthClientDetailsDTO.getApplicationname().getBytes());
         oauthClientDetails.setUser(u);
-        oauthClientDetails.setClientsecret(encode.toString());
+        //oauthClientDetails.setClientsecret(encode.toString().replaceAll("[@\\[]", ""));
+        MessageDigest m = MessageDigest.getInstance("MD5");
+        m.update(oauthClientDetailsDTO.getApplicationname().getBytes(),0, oauthClientDetailsDTO.getApplicationname().length());
+        oauthClientDetails.setClientsecret(new BigInteger(1,m.digest()).toString(16));
         oauthClientDetails.setScope("read", "write");
         oauthClientDetails.setAuthorizedGrantTypes("password","refresh_token" ,"authorization_code" ,"implicit");
         oauthClientDetails.setAuthorities("ROLE_USER");
@@ -226,14 +232,17 @@ public class UserService {
         return oauthClientDetails;
     }
 
-    public OauthData retrieveApplications(User u) {
-        OauthClientDetails oauthClientDetails = oauthRepository.findAllByUser(u).get();
-        OauthData oauthData = new OauthData();
 
-        //oauthData.setId(oauthClientDetails.getId());
-        oauthData.setId(oauthClientDetails.getId());
-        oauthData.setCliendId(oauthClientDetails.getApplicationname());
-        oauthData.setClientToken(oauthClientDetails.getClientsecret());
+    public List<OauthData> retrieveApplications(User u) {
+        List<OauthClientDetails> oauthClientDetails = oauthRepository.findAllByUser(u).get();
+        List<OauthData> oauthData = new ArrayList<>();
+        for(OauthClientDetails n: oauthClientDetails){
+            OauthData data = new OauthData();
+            data.setId(n.getId());
+            data.setClientId(n.getApplicationname());
+            data.setClientToken(n.getClientsecret());
+            oauthData.add(data);
+        }
         return oauthData;
     }
 
@@ -285,6 +294,18 @@ public class UserService {
             u.getAuthorities().size();
             return u;
         });
+    }
+
+    @Transactional(readOnly = true)
+    public OauthData findOneOauth(Long id){
+        log.debug("Request to get oauth client details: {}", id);
+        OauthClientDetails oauthClientDetails = oauthRepository.findOne(id);
+        OauthData data = new OauthData();
+        data.setId(oauthClientDetails.getId());
+        data.setClientId(oauthClientDetails.getApplicationname());
+        data.setClientToken(oauthClientDetails.getClientsecret());
+
+        return data;
     }
 
     @Transactional(readOnly = true)

@@ -28,7 +28,7 @@
         function save() {
             vm.isSaving = true;
 
-                OauthApp.save(vm.oauthapp, onSaveSuccess, onSaveError);
+                OauthApps.save(vm.oauthapp, onSaveSuccess, onSaveError);
         }
 
         function onSaveSuccess (result) {

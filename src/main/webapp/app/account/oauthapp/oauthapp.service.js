@@ -9,23 +9,31 @@
 
       function OauthApps ($resource){
 
-            var resourceUrl = 'api/account/apps';
+            var resourceUrl = 'api/account/apps/:id';
 
             return $resource(resourceUrl, {}, {
 
-                   'get': {
+                  'query': { method: 'GET', isArray: true},
 
+                   'get': {
                         method: 'GET',
+                        isArray: true,
                         transformResponse: function (data) {
                                 if (data){
                                     data = angular.fromJson(data);
                                 }
                                 return data;
                         }
-                   }
+                   },
+
+
 
             });
+
+
       }
+
+
 
 
 })();

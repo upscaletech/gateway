@@ -17,16 +17,16 @@
 
         function loadAll () {
 
-            OauthApps.get({
+          OauthApps.query({}, onSuccess, onError);
 
-            }, onSuccess, onError);
-
-           function onSuccess(data, headers) {
-                vm.oauthapps = data;
+           function onSuccess(response) {
+               console.log(response);
+               vm.oauthapps = response;
            }
 
-           function onError(error) {
-            AlertService.error(error.data.message);
+           function onError(response) {
+                console.log(response);
+            AlertService.error(response.data.message);
            }
         }
 

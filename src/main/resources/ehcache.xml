@@ -36,4 +36,36 @@
     <cache name="com.upscale.front.domain.User.persistentTokens"
            timeToLiveSeconds="3600">
     </cache>
+
+    <cache name="com.upscale.front.domain.Documents" timeToLiveSeconds="3600">
+
+    </cache>
+
+    <cache name="com.upscale.front.domain.Tenant" timeToLiveSeconds="3600">
+
+    </cache>
+
+    <cache name="com.upscale.front.domain.LoanProducts" timeToLiveSeconds="3600">
+
+    </cache>
+
+    <cache name="com.upscale.front.domain.Client" timeToLiveSeconds="3600">
+
+    </cache>
+
+    <cache name="com.upscale.front.domain.OauthClientDetails" timeToLiveSeconds="3600">
+
+    </cache>
+
+    <cache name="com.upscale.front.domain.Products" timeToLiveSeconds="3600">
+
+    </cache>
+
+    <cache name="com.upscale.front.domain.Loan" timeToLiveSeconds="3600">
+
+    </cache>
+
+    <cache name="com.upscale.front.domain.CollateralData" timeToLiveSeconds="3600">
+
+    </cache>
     </ehcache>
