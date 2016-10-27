@@ -17,7 +17,7 @@
 
                    'get': {
                         method: 'GET',
-                        isArray: true,
+                        isArray: false,
                         transformResponse: function (data) {
                                 if (data){
                                     data = angular.fromJson(data);

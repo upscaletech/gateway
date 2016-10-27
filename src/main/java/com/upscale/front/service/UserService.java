@@ -246,6 +246,10 @@ public class UserService {
         return oauthData;
     }
 
+    public void deleteOauthApp(Long id){
+        log.debug("Deleting oauth app {} ", id);
+        oauthRepository.delete(id);
+    }
 
     public OauthClientDetails retrieveApplicationsByName(String applicationname, User u) {
         OauthClientDetails oauthClientDetails = oauthRepository.findOneByApplicationnameAndUser(applicationname, u).get();

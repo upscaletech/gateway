@@ -659,17 +659,17 @@ public class AccountResource {
      * DELETE /account/apps : Delete single application oauth apps for current user logged in
      *
      *
-     * @param applicationname
+     * @param id
      *
      *
      */
-    @RequestMapping(value = "/account/apps", method = RequestMethod.DELETE, produces = MediaType.TEXT_PLAIN_VALUE)
+    @RequestMapping(value = "/account/apps/{id}", method = RequestMethod.DELETE, produces = MediaType.TEXT_PLAIN_VALUE)
     @Timed
-    public ResponseEntity<String> deleteApp(@RequestParam(value = "applicationname") String applicationname) {
+    public ResponseEntity<String> deleteApp(@PathVariable Long id) {
+        log.debug("Rest request to delete the oauth apps: {}", id);
         return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).map(u ->{
-            OauthClientDetails oauthClientDetails = userService.retrieveApplicationsByName(applicationname, u);
-            userService.deleteApplication(oauthClientDetails);
-            return new ResponseEntity<String>(HttpStatus.GONE);
+            userService.deleteOauthApp(id);
+            return new ResponseEntity<String>(HttpStatus.OK);
         }).orElse(new ResponseEntity<String>(HttpStatus.FOUND.INTERNAL_SERVER_ERROR));
     }
 

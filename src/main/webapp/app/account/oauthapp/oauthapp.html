@@ -27,18 +27,12 @@
             <tbody>
             <tr ng-repeat="oauthapps in vm.oauthapps">
                 <td><a ui-sref="oauth-detail({id:oauthapps.id})">{{oauthapps.id}}</a></td>
-                <td>{{oauthapps.cliendId}}</td>
+                <td>{{oauthapps.clientId}}</td>
                 <td>{{oauthapps.clientToken}}</td>
                 <td class="text-right">
                     <div class="btn-group flex-btn-group-container">
                         <button type="submit"
-                                ui-sref="oauthapp-detail({id:oauthapps.id})"
-                                class="btn btn-info btn-sm">
-                            <span class="glyphicon glyphicon-eye-open"></span>
-                            <span class="hidden-xs hidden-sm"></span>
-                        </button>
-                        <button type="submit"
-                                ui-sref="oauthapp.delete({applicationname:oauthapps.applicationname})"
+                                ui-sref="oauthapp.delete({id:oauthapps.id})"
                                 class="btn btn-danger btn-sm">
                             <span class="glyphicon glyphicon-remove-circle"></span>
                             <span class="hidden-xs hidden-sm"></span>
